@@ -1,5 +1,4 @@
-import React from "react";
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import {
   NameInputTitle,
   NameInput,
@@ -7,94 +6,79 @@ import {
   PhoneInput,
   SectionInputs,
   Submit,
-} from "./addform.styled";
+} from './addform.styled';
+import { useState } from 'react';
 
-export class InputForm extends React.Component {
-  state = {
-    name: "",
-    number: "",
-  };
+export const InputForm = props => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  // handleInputsChange = ({ target: { name, value } }) => {
-  //   this.setState({ [name]: value });
-  // };
-
-  handleInputsChange = ({ target: { name, value } }) => {
-    if (name === "name") {
+  const handleInputsChange = ({ target: { name, value } }) => {
+    if (name === 'name') {
       const nameRegex = /^[a-zA-Zа-яА-ЯІіЇїЄєҐґ\s'-]+$/;
-      if (value !== "" && !nameRegex.test(value)) {
+      if (value !== '' && !nameRegex.test(value)) {
         alert(
-          "Name may contain only letters, apostrophe, dash, spaces, and Cyrillic characters. For example Adrian, Jacob Mercer, Іван, Олена"
+          'Name may contain only letters, apostrophe, dash, spaces, and Cyrillic characters. For example Adrian, Jacob Mercer, Іван, Олена'
         );
         return;
       }
+      setName(value);
     } else {
       const phoneRegex = /^[+\-\d]+$/;
-      if (value !== "") {
+      if (value !== '') {
         if (!phoneRegex.test(value)) {
-          alert("Phone may contain only +, -, and digits.");
+          alert('Phone may contain only +, -, and digits.');
           return;
         }
         if (value.length > 15) {
-          alert("Phone number should not exceed 15 characters.");
+          alert('Phone number should not exceed 15 characters.');
           return;
         }
       }
+      setNumber(value);
     }
-    this.setState({ [name]: value });
   };
 
-  // const ChangePhone = (e) => {
-  //   const { value } = e.currentTarget;
+  const reset = () => {
+    setName('');
+    setNumber('');
+  };
 
-  //   setId(shortid.generate());
-  //   setPhone(value);
-  // };
-
-  reset() {
-    this.setState({ name: "", number: "" });
-  }
-
-  handleSubmit = (event) => {
+  const handleSubmit = event => {
     event.preventDefault();
 
     const newContactData = {
-      name: this.state.name,
-      number: this.state.number,
+      name: name,
+      number: number,
     };
-
-    this.props.addContact(newContactData);
-    this.reset();
+    props.addContact(newContactData);
+    reset();
   };
 
-  static propTypes = {
+  InputForm.propTypes = {
     addContact: PropTypes.func.isRequired,
   };
 
-  render() {
-    const { name, number } = this.state;
+  return (
+    <SectionInputs onSubmit={handleSubmit}>
+      <NameInputTitle className="name">Name</NameInputTitle>
+      <NameInput
+        type="text"
+        name="name"
+        value={name}
+        onChange={handleInputsChange}
+        required
+      />
+      <PhoneInputTitle className="number">Number</PhoneInputTitle>
+      <PhoneInput
+        type="tel"
+        name="number"
+        value={number}
+        onChange={handleInputsChange}
+        required
+      />
 
-    return (
-      <SectionInputs onSubmit={this.handleSubmit}>
-        <NameInputTitle className="name">Name</NameInputTitle>
-        <NameInput
-          type="text"
-          name="name"
-          value={name}
-          onChange={this.handleInputsChange}
-          required
-        />
-        <PhoneInputTitle className="number">Number</PhoneInputTitle>
-        <PhoneInput
-          type="tel"
-          name="number"
-          value={number}
-          onChange={this.handleInputsChange}
-          required
-        />
-
-        <Submit type="submit">Add contact</Submit>
-      </SectionInputs>
-    );
-  }
-}
+      <Submit type="submit">Add contact</Submit>
+    </SectionInputs>
+  );
+};
